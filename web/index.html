@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anji's Amp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#e6e1d9;--ink:#1f1d1a;--muted:#8a847a;--accent:#e0705a;--track:#ebe6de}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 20px 40px}
+header{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:27px;letter-spacing:-.03em;margin-right:auto}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block}
+.presetbar{display:flex;gap:8px;align-items:center}
+button,select{font:inherit;color:var(--ink)}
+.btn{border:1px solid var(--border);background:var(--card);border-radius:999px;height:38px;padding:0 16px;font-weight:600;font-size:14px;cursor:pointer;transition:background .12s}
+.btn:hover{background:var(--bg)}
+.btn.round{width:38px;padding:0}
+.btn.dark,.btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+select{appearance:none;-webkit-appearance:none;border:1px solid var(--border);background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a847a' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;border-radius:10px;height:38px;padding:0 36px 0 14px;font-size:14px;cursor:pointer}
+#preset{width:300px;text-align:center;text-align-last:center}
+.notes{text-align:center;color:var(--muted);font-size:13.5px;margin:12px 0 16px;min-height:18px}
+.transport{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:14px}
+.transport .lbl{font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--muted);margin:0 6px 0 4px}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:999px;height:32px;padding:0 13px;font-size:13px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.play{width:42px;height:42px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:grid;place-items:center;margin-left:auto}
+.play svg{width:16px;height:16px}
+.meter{width:120px;height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.meter b{display:block;height:100%;width:0;background:var(--accent);transition:width .05s}
+.grid{display:grid;gap:12px}
+.row1{grid-template-columns:140px 210px minmax(0,1fr) 190px}
+.row3{grid-template-columns:250px 140px 180px minmax(0,1fr) 180px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px 10px;box-shadow:0 2px 0 rgba(0,0,0,.03);position:relative}
+.card h3{margin:0 0 6px;font-size:11.5px;letter-spacing:.12em;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:7px}
+.card h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--border)}
+.card.active h3{color:var(--ink)}.card.active h3::before{background:var(--accent)}
+.sw{position:absolute;top:11px;right:12px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--muted);user-select:none}
+.toggle .pill{width:30px;height:16px;border-radius:8px;background:var(--track);position:relative;transition:background .12s}
+.toggle .pill::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .12s}
+.toggle.on{color:var(--ink)}.toggle.on .pill{background:var(--accent)}.toggle.on .pill::after{left:16px}
+.knobs{display:flex;justify-content:space-around;align-items:flex-start;gap:4px}
+.knob{display:flex;flex-direction:column;align-items:center;user-select:none;touch-action:none;min-width:0}
+.knob .nm{font-size:12px;font-weight:700;margin-bottom:2px}
+.knob svg{cursor:ns-resize;display:block}
+.knob .val{font-size:11.5px;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
+.amp{margin:12px 0}
+.models{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin:4px 0 8px}
+.models .btn{height:32px;font-size:13.5px;padding:0 6px}
+.blurb{color:var(--muted);font-size:13.5px;margin:0 4px 6px}
+.ampknobs{display:flex;align-items:center}
+.ampknobs .knobs{flex:1}
+.drivebody{display:flex;align-items:center;gap:10px}.drivebody select{width:130px}
+.drivebody .knobs{flex:1}
+.cabbody{display:flex;gap:8px;align-items:center}
+.cabbody .left{flex:1;display:flex;flex-direction:column;gap:8px}
+.small{font-size:12px;color:var(--muted);line-height:1.4}
+footer{margin-top:18px;color:var(--muted);font-size:12.5px;text-align:center;line-height:1.6}
+@media (max-width:980px){.row1,.row3{grid-template-columns:1fr 1fr}.models{grid-template-columns:repeat(5,1fr)}#preset{width:220px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><i></i>anji's amp</div>
+    <div class="presetbar">
+      <button class="btn round" id="prev" aria-label="Previous preset">&lt;</button>
+      <select id="preset" aria-label="Preset"></select>
+      <button class="btn round" id="next" aria-label="Next preset">&gt;</button>
+    </div>
+  </header>
+  <div class="notes" id="notes"></div>
+
+  <div class="transport">
+    <span class="lbl">INPUT</span>
+    <span id="riffs"></span>
+    <label class="chip" style="display:inline-flex;align-items:center">Upload DI…<input type="file" id="file" accept="audio/*" hidden></label>
+    <span class="toggle" id="bypass"><span>Bypass</span><span class="pill"></span></span>
+    <div class="meter" title="Output level"><b id="meter"></b></div>
+    <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 16 16" id="playicon"><path d="M4 2l10 6-10 6z" fill="#fff"/></svg></button>
+  </div>
+
+  <div class="grid row1">
+    <div class="card" data-power="gate_on"><h3>GATE</h3><div class="knobs" data-k="gate_thresh:Threshold"></div></div>
+    <div class="card" data-power="comp_on"><h3>COMPRESSOR</h3><div class="knobs" data-k="comp_amount:Sustain,comp_level:Level"></div></div>
+    <div class="card" data-power="od_on"><h3>DRIVE</h3>
+      <div class="drivebody"><select id="od_mode" aria-label="Drive type"></select><div class="knobs" data-k="od_drive:Drive,od_tone:Tone,od_level:Level"></div></div></div>
+    <div class="card active"><h3>LEVELS</h3><div class="knobs" data-k="in_gain:Input,out_gain:Output"></div></div>
+  </div>
+
+  <div class="card amp active"><h3>AMP</h3>
+    <div class="models" id="models"></div>
+    <div class="blurb" id="blurb"></div>
+    <div class="ampknobs"><div class="knobs big" data-k="gain:Gain,bass:Bass,mid:Middle,treble:Treble,presence:Presence,resonance:Resonance,master:Master"></div>
+      <span class="toggle" id="bright"><span>Bright</span><span class="pill"></span></span></div>
+  </div>
+
+  <div class="grid row3">
+    <div class="card active"><h3>CABINET</h3>
+      <div class="cabbody"><div class="left"><select id="cab" aria-label="Cabinet"></select>
+        <div class="small">The plugin also loads your own IR files.</div></div>
+        <div class="knobs" data-k="mic:Mic"></div></div></div>
+    <div class="card" data-power="trem_on"><h3>TREMOLO</h3><div class="knobs" data-k="trem_rate:Rate,trem_depth:Depth"></div></div>
+    <div class="card" data-power="chorus_on"><h3>CHORUS</h3><div class="knobs" data-k="chorus_rate:Rate,chorus_depth:Depth,chorus_mix:Mix"></div></div>
+    <div class="card" data-power="delay_on"><h3>DELAY</h3><div class="knobs" data-k="delay_time:Time,delay_fb:Repeat,delay_tone:Tone,delay_mix:Mix"></div></div>
+    <div class="card" data-power="reverb_on"><h3>REVERB</h3><div class="knobs" data-k="reverb_size:Size,reverb_tone:Tone,reverb_mix:Mix"></div></div>
+  </div>
+  <footer>Drag knobs up/down (Shift for fine control); double-click a knob to reset it.<br>
+  This is the same sound engine as the Anji's Amp VST3/AU plugin. Upload a dry DI guitar recording to hear your own playing.</footer>
+</div>
+
+<script id="src-models">// GENERATED from Source/AnjiDSP.h + ParamTable.h
+const ANJI_AMPS = [{"name": "Glass", "blurb": "American blackface clean. Huge headroom, scooped, sparkly.", "inHpf": 40.0, "brightDb": 6.0, "stages": 2, "stGain": [1.0, 1.4, 0.0, 0.0], "stBias": [0.15, 0.1, 0.0, 0.0], "stLpf": [12000.0, 9000.0, 0.0, 0.0], "stHpf": [30.0, 40.0, 0.0, 0.0], "gainMinDb": -10.0, "gainMaxDb": 18.0, "bassF": 100.0, "bassRange": 12.0, "midF": 500.0, "midQ": 0.7, "midBase": -4.0, "midRange": 6.0, "trebF": 2200.0, "trebRange": 12.0, "powerDrive": 0.8, "sag": 0.15, "presF": 4000.0, "resF": 90.0, "solidState": false, "trimDb": 7.4}, {"name": "Twinkle", "blurb": "Small combo clean that blooms when you dig in. Emo heaven.", "inHpf": 50.0, "brightDb": 5.0, "stages": 2, "stGain": [1.6, 2.2, 0.0, 0.0], "stBias": [0.2, 0.15, 0.0, 0.0], "stLpf": [10000.0, 7000.0, 0.0, 0.0], "stHpf": [40.0, 60.0, 0.0, 0.0], "gainMinDb": -6.0, "gainMaxDb": 20.0, "bassF": 110.0, "bassRange": 10.0, "midF": 600.0, "midQ": 0.7, "midBase": -3.0, "midRange": 5.0, "trebF": 2500.0, "trebRange": 12.0, "powerDrive": 1.2, "sag": 0.4, "presF": 4500.0, "resF": 95.0, "solidState": false, "trimDb": -2.7}, {"name": "Chime", "blurb": "British class-A top boost. Jangly highs, chewy breakup.", "inHpf": 60.0, "brightDb": 3.0, "stages": 2, "stGain": [1.8, 2.0, 0.0, 0.0], "stBias": [0.25, 0.2, 0.0, 0.0], "stLpf": [11000.0, 8000.0, 0.0, 0.0], "stHpf": [60.0, 90.0, 0.0, 0.0], "gainMinDb": -4.0, "gainMaxDb": 22.0, "bassF": 120.0, "bassRange": 10.0, "midF": 1100.0, "midQ": 0.9, "midBase": 2.0, "midRange": 5.0, "trebF": 3000.0, "trebRange": 12.0, "powerDrive": 1.6, "sag": 0.6, "presF": 5000.0, "resF": 100.0, "solidState": false, "trimDb": -6.1}, {"name": "Basement", "blurb": "Big-iron British crunch. Loud, thick, punchy midrange.", "inHpf": 45.0, "brightDb": 3.0, "stages": 3, "stGain": [1.4, 2.5, 1.5, 0.0], "stBias": [0.2, 0.3, 0.1, 0.0], "stLpf": [9000.0, 6500.0, 7000.0, 0.0], "stHpf": [35.0, 70.0, 50.0, 0.0], "gainMinDb": -2.0, "gainMaxDb": 26.0, "bassF": 100.0, "bassRange": 10.0, "midF": 700.0, "midQ": 0.6, "midBase": 1.0, "midRange": 7.0, "trebF": 2500.0, "trebRange": 10.0, "powerDrive": 1.3, "sag": 0.35, "presF": 4000.0, "resF": 90.0, "solidState": false, "trimDb": -8.0}, {"name": "Plexi", "blurb": "'68 plexi, channels jumped. The classic rock sound.", "inHpf": 50.0, "brightDb": 4.0, "stages": 3, "stGain": [1.5, 3.0, 1.6, 0.0], "stBias": [0.25, 0.35, 0.15, 0.0], "stLpf": [10000.0, 6000.0, 7500.0, 0.0], "stHpf": [50.0, 100.0, 60.0, 0.0], "gainMinDb": 0.0, "gainMaxDb": 28.0, "bassF": 100.0, "bassRange": 9.0, "midF": 650.0, "midQ": 0.7, "midBase": 2.0, "midRange": 6.0, "trebF": 2800.0, "trebRange": 10.0, "powerDrive": 1.8, "sag": 0.5, "presF": 4000.0, "resF": 90.0, "solidState": false, "trimDb": -10.8}, {"name": "800", "blurb": "Single-channel British master volume. Tight, cutting crunch.", "inHpf": 80.0, "brightDb": 3.0, "stages": 3, "stGain": [2.0, 4.0, 2.0, 0.0], "stBias": [0.3, 0.4, 0.2, 0.0], "stLpf": [9000.0, 5500.0, 6500.0, 0.0], "stHpf": [90.0, 180.0, 80.0, 0.0], "gainMinDb": -4.0, "gainMaxDb": 30.0, "bassF": 110.0, "bassRange": 9.0, "midF": 750.0, "midQ": 0.7, "midBase": 3.0, "midRange": 6.0, "trebF": 3000.0, "trebRange": 10.0, "powerDrive": 1.5, "sag": 0.3, "presF": 4000.0, "resF": 95.0, "solidState": false, "trimDb": -12.3}, {"name": "Brown", "blurb": "Hot-rodded plexi. Saturated, singing 80s rock lead.", "inHpf": 70.0, "brightDb": 3.0, "stages": 4, "stGain": [2.0, 3.5, 3.0, 1.5], "stBias": [0.3, 0.4, 0.3, 0.15], "stLpf": [9000.0, 6000.0, 5000.0, 7000.0], "stHpf": [80.0, 150.0, 120.0, 60.0], "gainMinDb": -6.0, "gainMaxDb": 30.0, "bassF": 100.0, "bassRange": 9.0, "midF": 700.0, "midQ": 0.7, "midBase": 3.0, "midRange": 6.0, "trebF": 2800.0, "trebRange": 10.0, "powerDrive": 1.8, "sag": 0.45, "presF": 4000.0, "resF": 90.0, "solidState": false, "trimDb": -12.6}, {"name": "Modern", "blurb": "High-gain American. Tight lows, compressed, articulate.", "inHpf": 90.0, "brightDb": 2.0, "stages": 4, "stGain": [3.0, 5.0, 4.0, 2.0], "stBias": [0.3, 0.45, 0.35, 0.15], "stLpf": [8000.0, 5000.0, 4500.0, 6500.0], "stHpf": [150.0, 250.0, 200.0, 80.0], "gainMinDb": -8.0, "gainMaxDb": 34.0, "bassF": 120.0, "bassRange": 8.0, "midF": 600.0, "midQ": 0.7, "midBase": -2.0, "midRange": 7.0, "trebF": 3200.0, "trebRange": 9.0, "powerDrive": 1.2, "sag": 0.2, "presF": 4500.0, "resF": 100.0, "solidState": false, "trimDb": -11.9}, {"name": "Jazz", "blurb": "Solid-state stereo clean. Flat, fast, never breaks up.", "inHpf": 30.0, "brightDb": 4.0, "stages": 1, "stGain": [1.0, 0.0, 0.0, 0.0], "stBias": [0.0, 0.0, 0.0, 0.0], "stLpf": [15000.0, 0.0, 0.0, 0.0], "stHpf": [30.0, 0.0, 0.0, 0.0], "gainMinDb": -10.0, "gainMaxDb": 16.0, "bassF": 120.0, "bassRange": 12.0, "midF": 800.0, "midQ": 0.7, "midBase": 0.0, "midRange": 8.0, "trebF": 3000.0, "trebRange": 12.0, "powerDrive": 0.7, "sag": 0.0, "presF": 4000.0, "resF": 90.0, "solidState": true, "trimDb": 9.8}];
+const ANJI_CABS = [{"name": "1x12 Cream", "hpf": 80.0, "resF": 120.0, "resDb": 2.0, "p1F": 700.0, "p1Db": -2.0, "p1Q": 0.8, "p2F": 2500.0, "p2Db": 3.0, "p2Q": 1.2, "lpf": 5500.0}, {"name": "2x12 Jensen", "hpf": 70.0, "resF": 100.0, "resDb": 2.0, "p1F": 400.0, "p1Db": -2.0, "p1Q": 0.8, "p2F": 2800.0, "p2Db": 3.0, "p2Q": 1.2, "lpf": 6000.0}, {"name": "2x12 Blue", "hpf": 75.0, "resF": 110.0, "resDb": 3.0, "p1F": 1200.0, "p1Db": 2.0, "p1Q": 1.0, "p2F": 3500.0, "p2Db": 4.0, "p2Q": 1.5, "lpf": 6500.0}, {"name": "4x12 Greenback", "hpf": 70.0, "resF": 100.0, "resDb": 4.0, "p1F": 1500.0, "p1Db": 3.0, "p1Q": 1.0, "p2F": 3000.0, "p2Db": 2.0, "p2Q": 1.2, "lpf": 4800.0}, {"name": "4x12 V30", "hpf": 80.0, "resF": 110.0, "resDb": 4.0, "p1F": 500.0, "p1Db": -2.0, "p1Q": 0.9, "p2F": 2500.0, "p2Db": 5.0, "p2Q": 2.0, "lpf": 5500.0}, {"name": "Off (DI)", "hpf": 0.0, "resF": 0.0, "resDb": 0.0, "p1F": 0.0, "p1Db": 0.0, "p1Q": 1.0, "p2F": 0.0, "p2Db": 0.0, "p2Q": 1.0, "lpf": 0.0}];
+const ANJI_PARAMS = [{"id": "in_gain", "name": "Input", "type": "float", "min": -12.0, "max": 12.0, "unit": "dB", "def": 0.0}, {"id": "out_gain", "name": "Output", "type": "float", "min": -24.0, "max": 12.0, "unit": "dB", "def": 0.0}, {"id": "gate_on", "name": "Gate On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "gate_thresh", "name": "Gate Threshold", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 3.0}, {"id": "comp_on", "name": "Comp On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "comp_amount", "name": "Comp Sustain", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "comp_level", "name": "Comp Level", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "od_on", "name": "Drive On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "od_mode", "name": "Drive Type", "type": "choice", "min": 0, "max": null, "def": 0.0}, {"id": "od_drive", "name": "Drive", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "od_tone", "name": "Drive Tone", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "od_level", "name": "Drive Level", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "amp", "name": "Amp", "type": "choice", "min": 0, "max": null, "def": 0.0}, {"id": "gain", "name": "Gain", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "bass", "name": "Bass", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "mid", "name": "Mid", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "treble", "name": "Treble", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "presence", "name": "Presence", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "resonance", "name": "Resonance", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "master", "name": "Master", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "bright", "name": "Bright", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "cab", "name": "Cab", "type": "choice", "min": 0, "max": null, "def": 0.0}, {"id": "mic", "name": "Mic Position", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 3.0}, {"id": "trem_on", "name": "Trem On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "trem_rate", "name": "Trem Rate", "type": "float", "min": 1.0, "max": 12.0, "unit": "Hz", "def": 5.0}, {"id": "trem_depth", "name": "Trem Depth", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "chorus_on", "name": "Chorus On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "chorus_rate", "name": "Chorus Rate", "type": "float", "min": 0.1, "max": 6.0, "unit": "Hz", "def": 0.8}, {"id": "chorus_depth", "name": "Chorus Depth", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "chorus_mix", "name": "Chorus Mix", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "delay_on", "name": "Delay On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "delay_time", "name": "Delay Time", "type": "float", "min": 20.0, "max": 1500.0, "unit": "ms", "def": 380.0}, {"id": "delay_fb", "name": "Delay Feedback", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 3.0}, {"id": "delay_mix", "name": "Delay Mix", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 2.5}, {"id": "delay_tone", "name": "Delay Tone", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "reverb_on", "name": "Reverb On", "type": "bool", "min": 0, "max": 1, "def": 0.0}, {"id": "reverb_size", "name": "Reverb Size", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "reverb_tone", "name": "Reverb Tone", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 5.0}, {"id": "reverb_mix", "name": "Reverb Mix", "type": "float", "min": 0.0, "max": 10.0, "unit": "", "def": 2.5}];
+</script>
+<script id="src-presets">// GENERATED from presets.json
+const ANJI_DATA = {"amps": ["Glass", "Twinkle", "Chime", "Basement", "Plexi", "800", "Brown", "Modern", "Jazz"], "cabs": ["1x12 Cream", "2x12 Jensen", "2x12 Blue", "4x12 Greenback", "4x12 V30", "Off (DI)"], "driveModes": ["Green", "Gold", "Treble", "Fuzz"], "presets": [{"name": "Dorm Room Twinkle", "category": "Midwest Emo", "notes": "Glassy, compressed clean for twinkly arpeggios. Bridge or middle pickup.", "values": {"amp": 1.0, "gain": 3.5, "bass": 4.0, "mid": 5.5, "treble": 6.5, "presence": 6.0, "resonance": 4.0, "master": 5.0, "bright": 1.0, "comp_on": 1.0, "comp_amount": 4.0, "cab": 0.0, "mic": 3.0, "delay_on": 1.0, "delay_time": 340.0, "delay_fb": 2.0, "delay_mix": 1.5, "delay_tone": 4.0, "reverb_on": 1.0, "reverb_size": 4.0, "reverb_tone": 6.0, "reverb_mix": 2.5, "out_gain": -2.3}}, {"name": "Math Rock Sparkle", "category": "Midwest Emo", "notes": "Tight, bright and articulate for tapping and odd-time riffs.", "values": {"amp": 0.0, "gain": 5.0, "bass": 3.5, "mid": 6.0, "treble": 7.0, "presence": 6.5, "bright": 1.0, "comp_on": 1.0, "comp_amount": 5.5, "cab": 1.0, "mic": 2.0, "reverb_on": 1.0, "reverb_size": 3.0, "reverb_mix": 1.8, "out_gain": -11.3}}, {"name": "Open Tuning Shimmer", "category": "Midwest Emo", "notes": "Chimey clean with gentle chorus and a wide room. Great for open tunings.", "values": {"amp": 2.0, "gain": 3.0, "bass": 4.5, "mid": 5.0, "treble": 6.0, "presence": 5.0, "master": 4.0, "comp_on": 1.0, "comp_amount": 3.0, "cab": 2.0, "mic": 3.0, "chorus_on": 1.0, "chorus_rate": 0.6, "chorus_depth": 4.0, "chorus_mix": 3.5, "delay_on": 1.0, "delay_time": 450.0, "delay_fb": 3.5, "delay_mix": 2.5, "reverb_on": 1.0, "reverb_size": 7.0, "reverb_tone": 6.0, "reverb_mix": 3.5, "out_gain": 2.8}}, {"name": "Sad Telecaster Trem", "category": "Midwest Emo", "notes": "Edge-of-breakup clean with slow tremolo. Quiet part before the loud part.", "values": {"amp": 0.0, "gain": 6.0, "bass": 4.5, "mid": 5.0, "treble": 6.5, "bright": 1.0, "comp_on": 1.0, "comp_amount": 3.0, "cab": 0.0, "mic": 4.0, "trem_on": 1.0, "trem_rate": 4.5, "trem_depth": 4.0, "reverb_on": 1.0, "reverb_size": 6.0, "reverb_mix": 3.0, "out_gain": -8.9}}, {"name": "Sunny Day Jangle", "category": "Midwest Emo", "notes": "Strummy, bright, just starting to grit up when you dig in.", "values": {"amp": 2.0, "gain": 5.0, "bass": 4.5, "mid": 6.0, "treble": 6.5, "comp_on": 1.0, "comp_amount": 3.0, "cab": 2.0, "mic": 3.0, "reverb_on": 1.0, "reverb_size": 4.0, "reverb_mix": 2.0, "out_gain": -2.9}}, {"name": "Basement Show Crunch", "category": "Midwest Emo", "notes": "The loud part. Thick, punchy crunch with a screamer pushing the front end.", "values": {"amp": 3.0, "gain": 5.5, "bass": 5.0, "mid": 6.5, "treble": 6.0, "presence": 5.5, "master": 6.0, "od_on": 1.0, "od_mode": 0.0, "od_drive": 2.5, "od_tone": 6.0, "od_level": 7.0, "gate_on": 1.0, "gate_thresh": 2.0, "cab": 3.0, "mic": 4.0, "reverb_on": 1.0, "reverb_size": 3.0, "reverb_mix": 1.5, "out_gain": -6.7}}, {"name": "VFW Hall Wall", "category": "Midwest Emo", "notes": "Big open-chord wall of crunch for the climax.", "values": {"amp": 3.0, "gain": 8.0, "bass": 6.0, "mid": 6.0, "treble": 5.5, "master": 7.0, "od_on": 1.0, "od_mode": 1.0, "od_drive": 5.0, "od_tone": 5.0, "od_level": 6.0, "gate_on": 1.0, "gate_thresh": 3.0, "cab": 3.0, "mic": 5.0, "reverb_on": 1.0, "reverb_size": 5.0, "reverb_mix": 2.0, "out_gain": -8.8}}, {"name": "Emo Revival Lead", "category": "Midwest Emo", "notes": "Singing mid-forward lead line that sits above the band.", "values": {"amp": 4.0, "gain": 6.0, "bass": 5.0, "mid": 7.0, "treble": 6.0, "od_on": 1.0, "od_mode": 1.0, "od_drive": 6.0, "od_level": 6.0, "cab": 2.0, "delay_on": 1.0, "delay_time": 420.0, "delay_fb": 3.5, "delay_mix": 2.5, "reverb_on": 1.0, "reverb_mix": 2.0, "out_gain": -2.8}}, {"name": "Midwest Fuzz Swell", "category": "Midwest Emo", "notes": "Fuzzy, washy ending. Roll your volume knob for swells.", "values": {"amp": 1.0, "gain": 4.0, "od_on": 1.0, "od_mode": 3.0, "od_drive": 6.0, "od_tone": 4.0, "od_level": 5.0, "cab": 1.0, "delay_on": 1.0, "delay_time": 520.0, "delay_fb": 5.0, "delay_mix": 3.0, "reverb_on": 1.0, "reverb_size": 8.0, "reverb_mix": 4.0, "out_gain": -7.5}}, {"name": "Plexi Crunch", "category": "Classic Rock", "notes": "The benchmark. Turn your guitar down to clean up.", "values": {"amp": 4.0, "gain": 6.0, "bass": 5.0, "mid": 7.0, "treble": 6.5, "presence": 6.0, "master": 6.0, "cab": 3.0, "mic": 4.0, "reverb_on": 1.0, "reverb_size": 3.0, "reverb_mix": 1.2, "out_gain": -3.8}}, {"name": "Highway Rhythm", "category": "Classic Rock", "notes": "Dry, loud, mid-heavy power-chord crunch. Less gain than you think.", "values": {"amp": 4.0, "gain": 4.5, "bass": 4.5, "mid": 7.5, "treble": 6.5, "presence": 6.0, "master": 7.0, "cab": 3.0, "mic": 3.0, "out_gain": -5.4}}, {"name": "Hammer of the Gods", "category": "Classic Rock", "notes": "Treble booster into a cranked plexi. Late-60s British riffing.", "values": {"amp": 4.0, "gain": 5.0, "mid": 6.0, "treble": 6.0, "od_on": 1.0, "od_mode": 2.0, "od_drive": 6.0, "od_tone": 6.0, "od_level": 6.0, "cab": 3.0, "delay_on": 1.0, "delay_time": 300.0, "delay_fb": 1.5, "delay_mix": 1.5, "reverb_on": 1.0, "reverb_size": 5.0, "reverb_mix": 2.0, "out_gain": -2.8}}, {"name": "Voodoo Fuzz", "category": "Classic Rock", "notes": "Fuzz into a plexi on the edge. Cleans up with the guitar volume.", "values": {"amp": 4.0, "gain": 4.0, "od_on": 1.0, "od_mode": 3.0, "od_drive": 5.0, "od_tone": 5.5, "od_level": 5.0, "cab": 3.0, "reverb_on": 1.0, "reverb_size": 4.0, "reverb_mix": 2.0, "out_gain": -2.5}}, {"name": "Brown Sound", "category": "Classic Rock", "notes": "Saturated, singing late-70s/80s rock tone with a plate-ish verb.", "values": {"amp": 6.0, "gain": 6.5, "bass": 5.5, "mid": 6.0, "treble": 6.5, "presence": 6.0, "cab": 3.0, "reverb_on": 1.0, "reverb_size": 6.0, "reverb_tone": 7.0, "reverb_mix": 2.5, "out_gain": -1.3}}, {"name": "Hot Rod Rhythm", "category": "Classic Rock", "notes": "Master-volume crunch tightened with a screamer.", "values": {"amp": 5.0, "gain": 6.0, "mid": 6.5, "treble": 6.0, "presence": 6.0, "od_on": 1.0, "od_mode": 0.0, "od_drive": 1.5, "od_tone": 6.0, "od_level": 8.0, "gate_on": 1.0, "gate_thresh": 3.0, "cab": 4.0, "out_gain": -0.8}}, {"name": "Seventies Solo", "category": "Classic Rock", "notes": "Hot lead with a classic echo.", "values": {"amp": 5.0, "gain": 7.5, "mid": 7.0, "cab": 3.0, "delay_on": 1.0, "delay_time": 420.0, "delay_fb": 3.0, "delay_mix": 2.0, "reverb_on": 1.0, "reverb_size": 5.0, "reverb_mix": 2.0, "out_gain": -1.9}}, {"name": "Southern Twin Leads", "category": "Classic Rock", "notes": "Warm, vocal lead for harmony guitar parts.", "values": {"amp": 4.0, "gain": 7.0, "mid": 6.0, "treble": 5.5, "cab": 3.0, "delay_on": 1.0, "delay_time": 350.0, "delay_fb": 2.0, "delay_mix": 1.5, "reverb_on": 1.0, "reverb_mix": 2.0, "out_gain": -1.5}}, {"name": "British Invasion", "category": "Classic Rock", "notes": "Jangly 60s chime for chords and riffs.", "values": {"amp": 2.0, "gain": 4.5, "bass": 4.0, "treble": 7.0, "cab": 2.0, "reverb_on": 1.0, "reverb_mix": 1.5, "out_gain": -0.7}}, {"name": "Blues Breaker", "category": "Classic Rock", "notes": "Small combo pushed by a transparent drive.", "values": {"amp": 1.0, "gain": 6.0, "od_on": 1.0, "od_mode": 1.0, "od_drive": 4.0, "od_level": 6.0, "cab": 0.0, "reverb_on": 1.0, "reverb_mix": 2.0, "out_gain": -3.9}}, {"name": "Glass Clean", "category": "Clean", "notes": "Big, sparkly American clean with headroom for days.", "values": {"amp": 0.0, "gain": 4.0, "bass": 4.5, "mid": 5.0, "treble": 6.0, "bright": 1.0, "cab": 1.0, "reverb_on": 1.0, "reverb_size": 5.0, "reverb_mix": 2.5, "out_gain": -5.6}}, {"name": "Jazz Box", "category": "Clean", "notes": "Warm, round and flat. Neck pickup, tone rolled back a little.", "values": {"amp": 8.0, "gain": 5.0, "bass": 6.0, "mid": 5.0, "treble": 3.5, "cab": 1.0, "mic": 6.0, "reverb_on": 1.0, "reverb_size": 4.0, "reverb_tone": 3.0, "reverb_mix": 2.0, "out_gain": -0.8}}, {"name": "Funk Chicken", "category": "Clean", "notes": "Squashed, snappy and dry for 16th-note scratching.", "values": {"amp": 8.0, "gain": 5.0, "bass": 4.0, "mid": 4.0, "treble": 7.0, "comp_on": 1.0, "comp_amount": 7.0, "cab": 1.0, "mic": 2.0, "out_gain": -12.0}}, {"name": "Surf's Up", "category": "Clean", "notes": "Drippy, splashy reverb on a bright clean.", "values": {"amp": 0.0, "gain": 5.5, "bass": 4.0, "treble": 7.0, "bright": 1.0, "cab": 1.0, "reverb_on": 1.0, "reverb_size": 8.0, "reverb_tone": 8.0, "reverb_mix": 5.5, "out_gain": -9.8}}, {"name": "Neo Soul Glass", "category": "Clean", "notes": "Soft, chorused clean for extended chords.", "values": {"amp": 0.0, "gain": 4.0, "mid": 5.5, "treble": 5.0, "comp_on": 1.0, "comp_amount": 4.0, "chorus_on": 1.0, "chorus_rate": 0.5, "chorus_depth": 3.5, "chorus_mix": 3.0, "cab": 0.0, "mic": 5.0, "reverb_on": 1.0, "reverb_size": 5.0, "reverb_mix": 2.0, "out_gain": -3.3}}, {"name": "Country Snap", "category": "Clean", "notes": "Compressed, twangy clean with slapback.", "values": {"amp": 0.0, "gain": 5.0, "mid": 4.5, "treble": 7.0, "bright": 1.0, "comp_on": 1.0, "comp_amount": 6.0, "cab": 0.0, "delay_on": 1.0, "delay_time": 110.0, "delay_fb": 0.5, "delay_mix": 2.5, "out_gain": -10.5}}, {"name": "Ambient Swells", "category": "Clean", "notes": "Long delay into a huge reverb. Use volume swells.", "values": {"amp": 0.0, "gain": 4.0, "comp_on": 1.0, "comp_amount": 3.0, "cab": 1.0, "chorus_on": 1.0, "chorus_rate": 0.3, "chorus_depth": 3.0, "chorus_mix": 2.5, "delay_on": 1.0, "delay_time": 650.0, "delay_fb": 6.0, "delay_mix": 4.0, "delay_tone": 4.0, "reverb_on": 1.0, "reverb_size": 9.5, "reverb_tone": 5.0, "reverb_mix": 6.0, "out_gain": -6.1}}, {"name": "Warble Vibrato", "category": "Clean", "notes": "True pitch vibrato on a warm small-combo clean.", "values": {"amp": 1.0, "gain": 3.0, "cab": 0.0, "chorus_on": 1.0, "chorus_rate": 5.0, "chorus_depth": 3.0, "chorus_mix": 10.0, "reverb_on": 1.0, "reverb_mix": 2.0, "out_gain": 1.7}}, {"name": "Pop Punk Power", "category": "Heavy", "notes": "Bright, tight, loud power chords.", "values": {"amp": 5.0, "gain": 8.0, "bass": 6.0, "mid": 6.0, "treble": 6.0, "cab": 4.0, "gate_on": 1.0, "gate_thresh": 4.0, "out_gain": -0.2}}, {"name": "Seattle Sludge", "category": "Heavy", "notes": "Fuzz into a crunchy amp. Loose and heavy.", "values": {"amp": 3.0, "gain": 7.0, "mid": 5.0, "od_on": 1.0, "od_mode": 3.0, "od_drive": 4.0, "od_tone": 4.0, "od_level": 5.0, "cab": 4.0, "gate_on": 1.0, "gate_thresh": 3.0, "out_gain": -2.9}}, {"name": "Shoegaze Wall", "category": "Heavy", "notes": "Fuzz, chorus, delay and an enormous reverb.", "values": {"amp": 3.0, "gain": 6.0, "od_on": 1.0, "od_mode": 3.0, "od_drive": 7.0, "od_tone": 3.0, "od_level": 5.0, "cab": 3.0, "chorus_on": 1.0, "chorus_rate": 0.7, "chorus_depth": 5.0, "chorus_mix": 4.0, "delay_on": 1.0, "delay_time": 500.0, "delay_fb": 4.0, "delay_mix": 3.0, "reverb_on": 1.0, "reverb_size": 9.0, "reverb_mix": 6.0, "out_gain": -5.5}}, {"name": "Modern Metal", "category": "Heavy", "notes": "Tight high gain with a boost in front and a firm gate.", "values": {"amp": 7.0, "gain": 6.0, "bass": 5.5, "mid": 5.0, "treble": 6.0, "presence": 6.0, "od_on": 1.0, "od_mode": 0.0, "od_drive": 0.0, "od_tone": 6.0, "od_level": 8.0, "cab": 4.0, "gate_on": 1.0, "gate_thresh": 5.0, "out_gain": 0.5}}, {"name": "Djent Tight", "category": "Heavy", "notes": "Extremely tight low end, mid-forward, gated.", "values": {"amp": 7.0, "gain": 5.0, "bass": 4.0, "mid": 6.5, "treble": 6.5, "od_on": 1.0, "od_mode": 0.0, "od_drive": 0.0, "od_level": 8.0, "cab": 4.0, "mic": 2.0, "gate_on": 1.0, "gate_thresh": 6.0, "out_gain": 0.0}}]};
+</script>
+<script id="src-engine">// Anji's Amp — JS port of Source/AnjiDSP.h (same chain, same constants).
+// Requires models.js (ANJI_AMPS, ANJI_CABS, ANJI_PARAMS).
+(function (global) {
+const PI = Math.PI;
+const dbToGain = db => Math.pow(10, db * 0.05);
+const gainToDb = g => 20 * Math.log10(Math.max(g, 1e-9));
+const clamp01 = x => Math.min(1, Math.max(0, x));
+function ftanh(x) { if (x > 3) return 1; if (x < -3) return -1; const x2 = x * x; return x * (27 + x2) / (27 + 9 * x2); }
+const tube = (x, b) => ftanh(x + b) - ftanh(b);
+function solidClip(x) { const x4 = x * x * x * x; return x / Math.sqrt(Math.sqrt(1 + x4)); }
+
+class Biquad {
+  constructor() { this.b0 = 1; this.b1 = 0; this.b2 = 0; this.a1 = 0; this.a2 = 0; this.z1 = 0; this.z2 = 0; }
+  reset() { this.z1 = this.z2 = 0; }
+  process(x) { const y = this.b0 * x + this.z1; this.z1 = this.b1 * x - this.a1 * y + this.z2; this.z2 = this.b2 * x - this.a2 * y; return y; }
+  setN(B0, B1, B2, A0, A1, A2) { this.b0 = B0 / A0; this.b1 = B1 / A0; this.b2 = B2 / A0; this.a1 = A1 / A0; this.a2 = A2 / A0; }
+  static w0(fs, f) { return 2 * PI * Math.min(f, fs * 0.49) / fs; }
+  lowpass(fs, f, q) { const w = Biquad.w0(fs, f), c = Math.cos(w), al = Math.sin(w) / (2 * q); this.setN((1 - c) / 2, 1 - c, (1 - c) / 2, 1 + al, -2 * c, 1 - al); }
+  highpass(fs, f, q) { const w = Biquad.w0(fs, f), c = Math.cos(w), al = Math.sin(w) / (2 * q); this.setN((1 + c) / 2, -(1 + c), (1 + c) / 2, 1 + al, -2 * c, 1 - al); }
+  peak(fs, f, q, db) { const A = Math.pow(10, db / 40), w = Biquad.w0(fs, f), c = Math.cos(w), al = Math.sin(w) / (2 * q); this.setN(1 + al * A, -2 * c, 1 - al * A, 1 + al / A, -2 * c, 1 - al / A); }
+  lowShelf(fs, f, db) { const A = Math.pow(10, db / 40), w = Biquad.w0(fs, f), c = Math.cos(w), s = Math.sin(w), al = s / 2 * Math.SQRT2, sa = 2 * Math.sqrt(A) * al;
+    this.setN(A * ((A + 1) - (A - 1) * c + sa), 2 * A * ((A - 1) - (A + 1) * c), A * ((A + 1) - (A - 1) * c - sa), (A + 1) + (A - 1) * c + sa, -2 * ((A - 1) + (A + 1) * c), (A + 1) + (A - 1) * c - sa); }
+  highShelf(fs, f, db) { const A = Math.pow(10, db / 40), w = Biquad.w0(fs, f), c = Math.cos(w), s = Math.sin(w), al = s / 2 * Math.SQRT2, sa = 2 * Math.sqrt(A) * al;
+    this.setN(A * ((A + 1) + (A - 1) * c + sa), -2 * A * ((A - 1) + (A + 1) * c), A * ((A + 1) + (A - 1) * c - sa), (A + 1) - (A - 1) * c + sa, 2 * ((A - 1) - (A + 1) * c), (A + 1) - (A - 1) * c - sa); }
+  copyFrom(o) { this.b0 = o.b0; this.b1 = o.b1; this.b2 = o.b2; this.a1 = o.a1; this.a2 = o.a2; }
+}
+class OnePole {
+  constructor() { this.a = 0; this.z = 0; }
+  setLP(fs, f) { this.a = Math.exp(-2 * PI * Math.min(f, fs * 0.49) / fs); }
+  lp(x) { this.z = x + this.a * (this.z - x); return this.z; }
+  hp(x) { return x - this.lp(x); }
+  reset() { this.z = 0; }
+}
+class DelayLine {
+  constructor(n) { this.buf = new Float32Array(Math.max(4, n | 0)); this.w = 0; }
+  push(x) { this.buf[this.w] = x; if (++this.w >= this.buf.length) this.w = 0; }
+  read(d) { const n = this.buf.length; d = Math.min(Math.max(d, 1), n - 2); let rp = this.w - 1 - d; while (rp < 0) rp += n;
+    let i0 = rp | 0; if (i0 >= n) i0 -= n; const i1 = (i0 + 1) % n, fr = rp - Math.floor(rp); return this.buf[i0] + fr * (this.buf[i1] - this.buf[i0]); }
+}
+class Reverb {
+  prepare(fs) {
+    this.fs = fs; const s = fs / 44100; const c = [1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617], a = [556, 441, 341, 225];
+    const comb = n => ({ b: new Float32Array(Math.floor(n)), i: 0, store: 0 }), ap = n => ({ b: new Float32Array(Math.floor(n)), i: 0 });
+    this.cl = c.map(v => comb(v * s)); this.cr = c.map(v => comb((v + 23) * s));
+    this.al = a.map(v => ap(v * s)); this.ar = a.map(v => ap((v + 23) * s));
+    this.pre = new DelayLine(fs * 0.05);
+  }
+  process(inp, size01, tone01, out) {
+    this.pre.push(inp);
+    const x = this.pre.read(this.fs * 0.018) * 0.015, fb = 0.70 + 0.28 * size01, damp = 0.05 + 0.6 * (1 - tone01);
+    let l = 0, r = 0;
+    for (let k = 0; k < 8; ++k) {
+      let C = this.cl[k], o = C.b[C.i]; C.store = o * (1 - damp) + C.store * damp; C.b[C.i] = x + C.store * fb; if (++C.i >= C.b.length) C.i = 0; l += o;
+      C = this.cr[k]; o = C.b[C.i]; C.store = o * (1 - damp) + C.store * damp; C.b[C.i] = x + C.store * fb; if (++C.i >= C.b.length) C.i = 0; r += o;
+    }
+    for (let k = 0; k < 4; ++k) {
+      let A = this.al[k], bo = A.b[A.i], o = -l + bo; A.b[A.i] = l + bo * 0.5; if (++A.i >= A.b.length) A.i = 0; l = o;
+      A = this.ar[k]; bo = A.b[A.i]; o = -r + bo; A.b[A.i] = r + bo * 0.5; if (++A.i >= A.b.length) A.i = 0; r = o;
+    }
+    out[0] = l * 3; out[1] = r * 3;
+  }
+}
+
+const DRIVE_RANGE = [[6, 36], [0, 30], [0, 18], [18, 44]];
+const CAB_OFF = ANJI_CABS.length - 1;
+
+class AnjiEngine {
+  constructor(fs) {
+    this.fs = fs; this.fsO = fs * 2;
+    this.p = {}; for (const i of ANJI_PARAMS) this.p[i.id] = i.def;
+    const q = [0.5176380902, 0.7071067812, 1.9318516526];
+    this.up = q.map(v => { const b = new Biquad(); b.lowpass(fs * 2, fs * 0.45, v); return b; });
+    this.dn = q.map(v => { const b = new Biquad(); b.lowpass(fs * 2, fs * 0.45, v); return b; });
+    this.pre = [new Biquad(), new Biquad()];
+    this.stLpf = [0, 1, 2, 3].map(() => new Biquad()); this.stHpf = [0, 1, 2, 3].map(() => new Biquad());
+    this.stack = [0, 1, 2].map(() => new Biquad()); this.pwr = [new Biquad(), new Biquad()];
+    this.cabF = [0, 1, 2, 3, 4, 5].map(() => new Biquad());
+    this.odHp = new OnePole(); this.odHp2 = new OnePole(); this.odTone = new OnePole(); this.odTone2 = new OnePole();
+    this.dlyLp = new OnePole(); this.dlyHp = new OnePole();
+    this.delay = new DelayLine(fs * 2.1); this.chorus = new DelayLine(fs * 0.05);
+    this.reverb = new Reverb(); this.reverb.prepare(fs); this.rv = [0, 0];
+    this.gateEnv = 0; this.gateGain = 1; this.gateHold = 0; this.compEnv = 0; this.sagEnv = 0;
+    this.tremPh = 0; this.chorPh = 0; this.curDelay = -1;
+    this.dirty = true;
+  }
+  set(id, v) { if (this.p[id] !== v) { this.p[id] = v; this.dirty = true; } }
+  setAll(values) { for (const i of ANJI_PARAMS) this.p[i.id] = (values && values[i.id] !== undefined) ? values[i.id] : i.def; this.dirty = true; }
+
+  update() {
+    this.dirty = false; const p = this.p, fs = this.fs, fsO = this.fsO;
+    const ampI = Math.min(Math.max(Math.round(p.amp), 0), ANJI_AMPS.length - 1); this.ampI = ampI;
+    const a = ANJI_AMPS[ampI]; this.a = a;
+    const cabI = Math.min(Math.max(Math.round(p.cab), 0), ANJI_CABS.length - 1);
+    this.odMode = Math.min(Math.max(Math.round(p.od_mode), 0), 3);
+    const g01 = clamp01(p.gain / 10);
+    this.inG = dbToGain(p.in_gain); this.outG = dbToGain(p.out_gain);
+    this.gateOpenT = dbToGain(-80 + 5 * p.gate_thresh); this.gateCloseT = this.gateOpenT * 0.6; this.gateRel = Math.exp(-1 / (fs * 0.03));
+    this.compTh = -8 - 3.2 * p.comp_amount; this.compRatio = 3 + 0.5 * p.comp_amount;
+    this.compMakeup = dbToGain(-this.compTh * (1 - 1 / this.compRatio) * 0.55 + (p.comp_level - 5) * 1.2);
+    this.compAtt = 1 - Math.exp(-1 / (fs * 0.004)); this.compRelC = 1 - Math.exp(-1 / (fs * 0.15));
+    const dr = DRIVE_RANGE[this.odMode];
+    this.odGain = dbToGain(dr[0] + (dr[1] - dr[0]) * p.od_drive / 10); this.odOut = dbToGain((p.od_level - 5) * 2.4); this.odToneAmt = clamp01(p.od_tone / 10);
+    switch (this.odMode) {
+      case 0: this.odHp.setLP(fsO, 720); this.odTone.setLP(fsO, 700 * Math.pow(7, this.odToneAmt)); break;
+      case 1: this.odHp.setLP(fsO, 300); this.odTone.setLP(fsO, 1500); break;
+      case 2: this.odHp.setLP(fsO, 1200); this.odTone.setLP(fsO, 3000 + 9000 * this.odToneAmt); break;
+      default: this.odHp.setLP(fsO, 120); this.odHp2.setLP(fsO, 150); this.odTone.setLP(fsO, 900); this.odTone2.setLP(fsO, 1100);
+    }
+    this.preG = dbToGain(a.gainMinDb + (a.gainMaxDb - a.gainMinDb) * g01);
+    this.pre[0].highpass(fsO, a.inHpf, 0.7);
+    this.pre[1].highShelf(fsO, 2500, p.bright > 0.5 ? a.brightDb * (1 - 0.7 * g01) : 0);
+    for (let s = 0; s < a.stages; ++s) { this.stLpf[s].lowpass(fsO, a.stLpf[s], 0.6); this.stHpf[s].highpass(fsO, a.stHpf[s], 0.6); }
+    this.stack[0].lowShelf(fsO, a.bassF, (p.bass - 5) / 5 * a.bassRange);
+    this.stack[1].peak(fsO, a.midF, a.midQ, a.midBase + (p.mid - 5) / 5 * a.midRange);
+    this.stack[2].highShelf(fsO, a.trebF, (p.treble - 5) / 5 * a.trebRange);
+    this.pwrDrive = dbToGain(-20 + 3.2 * p.master) * a.powerDrive;
+    this.pwr[0].highShelf(fsO, a.presF, (p.presence - 5) * 1.6);
+    this.pwr[1].peak(fsO, a.resF, 0.8, (p.resonance - 5) * 1.4);
+    this.sagAtt = 1 - Math.exp(-1 / (fsO * 0.004)); this.sagRel = 1 - Math.exp(-1 / (fsO * 0.12));
+    this.ampTrim = dbToGain(a.trimDb);
+    this.useCab = cabI !== CAB_OFF;
+    if (this.useCab) {
+      const c = ANJI_CABS[cabI], m = clamp01(p.mic / 10);
+      this.cabF[0].highpass(fs, c.hpf, 0.8); this.cabF[1].peak(fs, c.resF, 1.4, c.resDb); this.cabF[2].peak(fs, c.p1F, c.p1Q, c.p1Db);
+      this.cabF[3].peak(fs, c.p2F, c.p2Q, c.p2Db + 3 * (1 - m) - 2 * m);
+      this.cabF[4].lowpass(fs, c.lpf * (1.35 - 0.6 * m), 0.75); this.cabF[5].lowpass(fs, c.lpf * (1.6 - 0.6 * m), 1.0);
+    }
+    this.tremInc = Math.max(0.1, p.trem_rate) / fs; this.tremDepth = clamp01(p.trem_depth / 10) * 0.9;
+    this.chorInc = Math.max(0.05, p.chorus_rate) / fs; this.chorDepth = clamp01(p.chorus_depth / 10); this.chorMix = clamp01(p.chorus_mix / 10);
+    this.dlyTarget = Math.min(Math.max(p.delay_time, 20), 2000) * 0.001 * fs;
+    this.dlyFb = clamp01(p.delay_fb / 10) * 0.92; this.dlyMix = clamp01(p.delay_mix / 10) * 0.9;
+    this.dlyLp.setLP(fs, 1500 + 8000 * clamp01(p.delay_tone / 10)); this.dlyHp.setLP(fs, 90);
+    this.revSize = clamp01(p.reverb_size / 10); this.revTone = clamp01(p.reverb_tone / 10); this.revMix = clamp01(p.reverb_mix / 10);
+    this.on = { gate: p.gate_on > 0.5, comp: p.comp_on > 0.5, od: p.od_on > 0.5, trem: p.trem_on > 0.5, chorus: p.chorus_on > 0.5, delay: p.delay_on > 0.5, reverb: p.reverb_on > 0.5 };
+  }
+
+  drive(x) {
+    switch (this.odMode) {
+      case 0: { const c = this.odHp.hp(x); let y = x + ftanh(c * this.odGain) * 0.6; y = this.odTone.lp(y); return y * this.odOut; }
+      case 1: { const c = this.odHp.hp(x); let v = c * this.odGain; v = v / (1 + Math.abs(v)); let y = x * 0.8 + v * 0.5;
+        y = y + (y - this.odTone.lp(y)) * (this.odToneAmt - 0.5) * 1.5; return y * this.odOut; }
+      case 2: { const c = x * 0.4 + this.odHp.hp(x) * this.odGain; let y = tube(c * 1.5, 0.25); y = this.odTone.lp(y); return y * this.odOut; }
+      default: { let v = this.odHp.hp(x) * this.odGain; v = ftanh(v); v = this.odHp2.hp(v); v = ftanh(v * 6 + 0.1) - 0.0997;
+        const lo = this.odTone.lp(v), hi = v - this.odTone2.lp(v); return (lo * (1 - this.odToneAmt) + hi * this.odToneAmt * 1.6) * this.odOut; }
+    }
+  }
+  nonlinear(x) {
+    const a = this.a;
+    if (this.on.od) x = this.drive(x);
+    x = this.pre[0].process(x) * this.preG; x = this.pre[1].process(x);
+    for (let s = 0; s < a.stages; ++s) {
+      x *= a.stGain[s]; x = a.solidState ? solidClip(x) : tube(x, a.stBias[s]);
+      x = this.stHpf[s].process(x); x = this.stLpf[s].process(x);
+    }
+    x = this.stack[0].process(x); x = this.stack[1].process(x); x = this.stack[2].process(x);
+    const ax = Math.abs(x);
+    this.sagEnv = ax > this.sagEnv ? this.sagEnv + (ax - this.sagEnv) * this.sagAtt : this.sagEnv + (ax - this.sagEnv) * this.sagRel;
+    let y = x * this.pwrDrive / (1 + a.sag * this.sagEnv * 2);
+    y = this.pwr[0].process(y); y = this.pwr[1].process(y);
+    return a.solidState ? solidClip(y) : tube(y, 0.06);
+  }
+  // inp: Float32Array mono; outL/outR: Float32Array
+  process(inp, outL, outR) {
+    if (this.dirty) this.update();
+    const n = inp.length, fs = this.fs, on = this.on, up = this.up, dn = this.dn, rv = this.rv;
+    for (let i = 0; i < n; ++i) {
+      let x = inp[i] * this.inG;
+      if (on.gate) {
+        const ax = Math.abs(x);
+        this.gateEnv = ax > this.gateEnv ? ax : this.gateEnv * this.gateRel;
+        if (this.gateEnv > this.gateOpenT) this.gateHold = (fs * 0.05) | 0; else if (this.gateHold > 0) --this.gateHold;
+        const t = (this.gateEnv > this.gateOpenT || this.gateHold > 0) ? 1 : (this.gateEnv < this.gateCloseT ? 0 : this.gateGain);
+        this.gateGain += (t - this.gateGain) * (t > this.gateGain ? 0.05 : 0.0015); x *= this.gateGain;
+      }
+      if (on.comp) {
+        const ax = Math.abs(x);
+        this.compEnv = ax > this.compEnv ? this.compEnv + (ax - this.compEnv) * this.compAtt : this.compEnv + (ax - this.compEnv) * this.compRelC;
+        const envDb = gainToDb(this.compEnv);
+        const gr = envDb > this.compTh ? (this.compTh + (envDb - this.compTh) / this.compRatio) - envDb : 0;
+        x *= dbToGain(gr) * this.compMakeup;
+      }
+      let u0 = x * 2, u1 = 0;
+      for (let k = 0; k < 3; ++k) u0 = up[k].process(u0);
+      for (let k = 0; k < 3; ++k) u1 = up[k].process(u1);
+      let y0 = this.nonlinear(u0), y1 = this.nonlinear(u1);
+      for (let k = 0; k < 3; ++k) y0 = dn[k].process(y0);
+      for (let k = 0; k < 3; ++k) y1 = dn[k].process(y1);
+      let y = y1;
+      if (this.useCab) for (let k = 0; k < 6; ++k) y = this.cabF[k].process(y);
+      x = y * this.ampTrim;
+
+      // ---- post
+      if (on.trem) {
+        this.tremPh += this.tremInc; if (this.tremPh > 1) this.tremPh -= 1;
+        const s = 0.5 + 0.5 * Math.sin(2 * PI * this.tremPh); x *= 1 - this.tremDepth * s * s * (3 - 2 * s);
+      }
+      let l = x, r = x;
+      if (on.chorus) {
+        this.chorus.push(x); this.chorPh += this.chorInc; if (this.chorPh > 1) this.chorPh -= 1;
+        const base = fs * 0.007, dep = fs * 0.0035 * this.chorDepth;
+        const wl = this.chorus.read(base + dep * Math.sin(2 * PI * this.chorPh)), wr = this.chorus.read(base + dep * Math.sin(2 * PI * this.chorPh + PI * 0.5));
+        l = x * (1 - this.chorMix * 0.5) + wl * this.chorMix * 0.7; r = x * (1 - this.chorMix * 0.5) + wr * this.chorMix * 0.7;
+      }
+      if (on.delay) {
+        if (this.curDelay < 0) this.curDelay = this.dlyTarget;
+        this.curDelay += (this.dlyTarget - this.curDelay) * 0.0002;
+        const d1 = this.delay.read(this.curDelay), d2 = this.delay.read(this.curDelay + fs * 0.011);
+        let fb = this.dlyHp.hp(this.dlyLp.lp(d1)) * this.dlyFb; fb = ftanh(fb * 1.2) / 1.2;
+        this.delay.push((l + r) * 0.5 + fb); l += d1 * this.dlyMix; r += d2 * this.dlyMix;
+      }
+      if (on.reverb) {
+        this.reverb.process((l + r) * 0.5, this.revSize, this.revTone, rv);
+        l = l * (1 - this.revMix * 0.3) + rv[0] * this.revMix; r = r * (1 - this.revMix * 0.3) + rv[1] * this.revMix;
+      }
+      outL[i] = l * this.outG; outR[i] = r * this.outG;
+    }
+  }
+}
+global.AnjiEngine = AnjiEngine;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>
+<script>
+(() => {
+const P = {}; ANJI_PARAMS.forEach(p => P[p.id] = p);
+P.amp.max = ANJI_AMPS.length - 1; P.cab.max = ANJI_CABS.length - 1; P.od_mode.max = ANJI_DATA.driveModes.length - 1;
+const CENTRE = { trem_rate: 4, chorus_rate: 1, delay_time: 350 };
+const vals = {}; let presetIdx = 0;
+const $ = s => document.querySelector(s);
+
+// ---------------- audio
+let ctx = null, node = null, sp = null, src = null, playing = false, bypass = false, engineMain = null, curBuf = null, curRiff = 0, uploaded = null;
+const send = m => { if (node) node.port.postMessage(m); if (engineMain) { if (m.type === 'set') engineMain.set(m.id, m.v); else if (m.type === 'all') engineMain.setAll(m.values); } };
+
+async function initAudio() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  const code = ['src-models', 'src-presets', 'src-engine'].map(id => document.getElementById(id).textContent).join('\n') + `
+  class AnjiProc extends AudioWorkletProcessor {
+    constructor() { super(); this.e = new AnjiEngine(sampleRate); this.byp = false; this.pk = 0; this.cnt = 0;
+      this.port.onmessage = ev => { const d = ev.data; if (d.type === 'set') this.e.set(d.id, d.v); else if (d.type === 'all') this.e.setAll(d.values); else if (d.type === 'bypass') this.byp = d.v; }; }
+    process(inputs, outputs) {
+      const out = outputs[0], L = out[0], R = out[1] || out[0], inp = inputs[0] && inputs[0][0];
+      if (!inp) { L.fill(0); if (R !== L) R.fill(0); return true; }
+      if (this.byp) { L.set(inp); if (R !== L) R.set(inp); } else this.e.process(inp, L, R);
+      for (let i = 0; i < L.length; i++) { const a = Math.abs(L[i]); if (a > this.pk) this.pk = a; }
+      if (++this.cnt >= 12) { this.port.postMessage(this.pk); this.pk = 0; this.cnt = 0; }
+      return true; } }
+  registerProcessor('anji-amp', AnjiProc);`;
+  try {
+    const url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
+    await ctx.audioWorklet.addModule(url);
+    node = new AudioWorkletNode(ctx, 'anji-amp', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], channelCount: 1, channelCountMode: 'explicit', channelInterpretation: 'speakers' });
+    node.port.onmessage = ev => showMeter(ev.data);
+  } catch (err) {
+    // Fallback: run the engine on the main thread
+    engineMain = new AnjiEngine(ctx.sampleRate);
+    sp = ctx.createScriptProcessor(1024, 1, 2);
+    sp.onaudioprocess = ev => {
+      const i = ev.inputBuffer.getChannelData(0), L = ev.outputBuffer.getChannelData(0), R = ev.outputBuffer.getChannelData(1);
+      if (bypass) { L.set(i); R.set(i); } else engineMain.process(i, L, R);
+      let pk = 0; for (let k = 0; k < L.length; k++) pk = Math.max(pk, Math.abs(L[k])); showMeter(pk);
+    };
+    node = null;
+  }
+  (node || sp).connect(ctx.destination);
+  send({ type: 'all', values: { ...vals } });
+  send({ type: 'bypass', v: bypass });
+}
+function showMeter(pk) { const db = 20 * Math.log10(pk + 1e-9); $('#meter').style.width = Math.max(0, Math.min(100, (db + 48) / 48 * 100)) + '%'; $('#meter').style.background = db > -1 ? '#d64545' : 'var(--accent)'; }
+
+function startSource() {
+  if (src) { try { src.stop(); } catch (e) {} src.disconnect(); }
+  src = ctx.createBufferSource(); src.buffer = curBuf; src.loop = true;
+  src.connect(node || sp); src.start();
+}
+async function play() {
+  await initAudio(); if (ctx.state === 'suspended') await ctx.resume();
+  if (!curBuf) curBuf = uploaded || renderRiff(curRiff, ctx.sampleRate);
+  startSource(); playing = true; updatePlay();
+}
+function stop() { if (src) { try { src.stop(); } catch (e) {} src = null; } playing = false; updatePlay(); }
+function updatePlay() { $('#playicon').innerHTML = playing ? '<rect x="3" y="2" width="4" height="12" fill="#fff"/><rect x="9" y="2" width="4" height="12" fill="#fff"/>' : '<path d="M4 2l10 6-10 6z" fill="#fff"/>'; }
+
+// ---------------- DI riff synthesis (Karplus-Strong strings)
+const OPEN = [82.407, 110, 146.832, 195.998, 246.942, 329.628];
+const fr = (s, f) => OPEN[s] * Math.pow(2, f / 12);
+function pluck(out, sr, t0, f, amp, t60, opt = {}) {
+  const bright = opt.bright ?? 0.6, mute = !!opt.mute, len = opt.len ?? t60;
+  const D = sr / f - 0.5, size = Math.ceil(D) + 3, buf = new Float32Array(size);
+  let lp = 0; const a = 1 - bright * 0.9, pickOff = Math.max(1, Math.round(size * (opt.pick ?? 0.13)));
+  const ex = new Float32Array(size); for (let i = 0; i < size; i++) { lp = lp * a + (Math.random() * 2 - 1) * (1 - a); ex[i] = lp; }
+  for (let i = 0; i < size; i++) buf[i] = ex[i] - (i >= pickOff ? ex[i - pickOff] : 0);
+  let mx = 0; for (let i = 0; i < size; i++) mx = Math.max(mx, Math.abs(buf[i])); for (let i = 0; i < size; i++) buf[i] /= (mx || 1);
+  const loss = Math.pow(10, -3 / (t60 * f)), w1 = mute ? 0.75 : 0.5;
+  let w = 0, last = 0; const start = Math.floor(t0 * sr), end = Math.min(out.length, start + Math.floor((len + 0.05) * sr)), rel = Math.floor(0.04 * sr);
+  for (let n = start; n < end; n++) {
+    let rp = w - D; while (rp < 0) rp += size; let i0 = rp | 0; if (i0 >= size) i0 -= size; const fr_ = rp - Math.floor(rp);
+    const y = buf[i0] * (1 - fr_) + buf[(i0 + 1) % size] * fr_;
+    const v = loss * (w1 * last + (1 - w1) * y); last = y; buf[w] = v; if (++w >= size) w = 0;
+    const env = n > end - rel ? (end - n) / rel : 1;
+    out[n] += y * amp * env;
+  }
+}
+function strum(out, sr, t, shape, amp, opt = {}) { // shape: frets per string low->high, null = not played
+  const up = opt.up, notes = shape.map((f, s) => f === null ? null : [s, f]).filter(Boolean); if (up) notes.reverse();
+  notes.forEach(([s, f], k) => pluck(out, sr, t + k * (opt.spread ?? 0.009), fr(s, f), amp * (up ? 0.7 : 1) * (0.9 + Math.random() * 0.2), opt.t60 ?? 3, opt));
+}
+const RIFFS = [
+  { name: 'Twinkle arps', bars: 4, bpm: 140, make(out, sr) {
+    const s16 = 60 / this.bpm / 4;
+    const chords = [[[2,3],[3,2],[4,1],[5,0]], [[1,3],[2,2],[3,0],[4,0],[5,0]], [[1,0],[2,2],[3,2],[4,1],[5,0]], [[0,3],[1,2],[3,0],[4,0],[5,3]]];
+    const pat = [0,2,1,3,2,1,3,2, 0,2,1,3,2,4,3,2];
+    chords.forEach((ch, b) => pat.forEach((pi, k) => { const [s, f] = ch[pi % ch.length];
+      pluck(out, sr, (b * 16 + k) * s16, fr(s, f), (k % 4 === 0 ? 1 : 0.75) * (0.9 + Math.random() * 0.2), 3.2, { bright: 0.7, len: 2.5, pick: 0.11 }); }));
+  } },
+  { name: 'Power chords', bars: 4, bpm: 118, make(out, sr) {
+    const e8 = 60 / this.bpm / 2, P5 = (s, f) => s === 0 ? [f, f + 2, f + 2, null, null, null] : [null, f, f + 2, f + 2, null, null];
+    const seq = [ ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(0,3),2],['r',P5(0,5),2],
+                  ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(1,5),2],['r',P5(1,3),2],
+                  ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(0,3),2],['r',P5(0,5),2],
+                  ['r',P5(0,7),3],['m',P5(0,5)],['r',P5(0,3),2],['r',P5(0,0),2] ];
+    let t = 0; for (const [k, sh, len = 1] of seq) { const m = k === 'm';
+      strum(out, sr, t, sh, m ? 0.8 : 1, { mute: m, t60: m ? 0.22 : 2.5, len: m ? e8 * 0.9 : e8 * len, bright: m ? 0.35 : 0.65, spread: 0.006 }); t += e8 * len; }
+  } },
+  { name: 'Open strums', bars: 4, bpm: 96, make(out, sr) {
+    const e8 = 60 / this.bpm / 2;
+    const ch = [[3,2,0,0,0,3], [null,3,2,0,1,0], [null,null,0,2,3,2], [0,2,2,0,0,0]];
+    const rhythm = [[0,'d'],[2,'d'],[3,'u'],[5,'u'],[6,'d'],[7,'u']];
+    ch.forEach((c, b) => rhythm.forEach(([pos, dir]) => strum(out, sr, (b * 8 + pos) * e8, c, dir === 'd' ? 0.9 : 0.6, { up: dir === 'u', t60: 2.2, len: 1.6, spread: 0.011, bright: 0.6 })));
+  } },
+  { name: 'Lead lick', bars: 4, bpm: 104, make(out, sr) {
+    const e8 = 60 / this.bpm / 2;
+    const L = [[3,7,1],[4,5,1],[4,8,1],[5,5,1],[5,8,2],[5,5,1],[4,8,1],[4,5,1],[3,7,2],[3,5,1],[2,7,1],[3,5,2],[2,7,4],
+               [4,5,1],[5,5,1],[5,8,1],[5,10,1],[5,8,1],[5,5,1],[4,8,2],[4,5,6]];
+    let t = 0; for (const [s, f, len] of L) { pluck(out, sr, t, fr(s, f), 1, len > 2 ? 3 : 1.6, { len: e8 * len + 0.02, bright: 0.6, pick: 0.2 }); t += e8 * len; }
+  } },
+];
+function renderRiff(i, sr) {
+  const r = RIFFS[i], secs = r.bars * 4 * 60 / r.bpm, N = Math.floor(secs * sr), tail = Math.floor(2.5 * sr);
+  const out = new Float32Array(N + tail); r.make(out, sr);
+  for (let n = 0; n < tail; n++) out[n] += out[N + n];      // wrap ringing tail into the loop start
+  const loop = out.subarray(0, N); let mx = 0; for (let n = 0; n < N; n++) mx = Math.max(mx, Math.abs(loop[n]));
+  const b = ctx.createBuffer(1, N, sr); const d = b.getChannelData(0); for (let n = 0; n < N; n++) d[n] = loop[n] * 0.5 / mx;
+  return b;
+}
+
+// ---------------- UI
+const fmt = (id, v) => { const u = P[id].unit; if (u === 'dB') return (v > 0 ? '+' : '') + v.toFixed(1) + ' dB'; if (u === 'ms') return Math.round(v) + ' ms'; if (u === 'Hz') return v.toFixed(2) + ' Hz'; return v.toFixed(1); };
+const skew = id => CENTRE[id] ? Math.log(0.5) / Math.log((CENTRE[id] - P[id].min) / (P[id].max - P[id].min)) : 1;
+const toPos = (id, v) => Math.pow((v - P[id].min) / (P[id].max - P[id].min), skew(id));
+const fromPos = (id, p) => P[id].min + (P[id].max - P[id].min) * Math.pow(Math.min(1, Math.max(0, p)), 1 / skew(id));
+const A0 = -135, A1 = 135;
+const pt = (cx, cy, r, deg) => { const a = (deg - 90) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+const arc = (cx, cy, r, d0, d1) => { if (d1 - d0 < 0.5) return ''; const [x0, y0] = pt(cx, cy, r, d0), [x1, y1] = pt(cx, cy, r, d1); return `M${x0} ${y0} A${r} ${r} 0 ${d1 - d0 > 180 ? 1 : 0} 1 ${x1} ${y1}`; };
+const ui = {};
+
+function makeKnob(id, name, size) {
+  const el = document.createElement('div'); el.className = 'knob';
+  const c = size / 2, lw = Math.max(2.5, size * 0.045), ar = c - lw / 2 - 2, br = c - lw * 2.4 - 2;
+  el.innerHTML = `<div class="nm">${name}</div><svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <path d="${arc(c, c, ar, A0, A1)}" stroke="var(--track)" stroke-width="${lw}" fill="none" stroke-linecap="round"/>
+    <path class="va" stroke="var(--accent)" stroke-width="${lw}" fill="none" stroke-linecap="round"/>
+    <circle cx="${c}" cy="${c + 2}" r="${br}" fill="rgba(0,0,0,.06)"/><circle cx="${c}" cy="${c}" r="${br}" fill="#fff" stroke="var(--border)"/>
+    <line class="ptr" stroke="var(--ink)" stroke-width="${Math.max(1.8, br * 0.09)}" stroke-linecap="round"/></svg><div class="val"></div>`;
+  const va = el.querySelector('.va'), ptr = el.querySelector('.ptr'), valEl = el.querySelector('.val'), svg = el.querySelector('svg');
+  ui[id] = v => { const d = A0 + toPos(id, v) * (A1 - A0); va.setAttribute('d', arc(c, c, ar, A0, d));
+    const [x0, y0] = pt(c, c, br * 0.3, d), [x1, y1] = pt(c, c, br * 0.78, d); ptr.setAttribute('x1', x0); ptr.setAttribute('y1', y0); ptr.setAttribute('x2', x1); ptr.setAttribute('y2', y1);
+    valEl.textContent = fmt(id, v); };
+  let startY = 0, startPos = 0;
+  svg.addEventListener('pointerdown', e => { svg.setPointerCapture(e.pointerId); startY = e.clientY; startPos = toPos(id, vals[id]); });
+  svg.addEventListener('pointermove', e => { if (!svg.hasPointerCapture(e.pointerId)) return; const sens = e.shiftKey ? 900 : 220;
+    setParam(id, fromPos(id, startPos + (startY - e.clientY) / sens)); });
+  svg.addEventListener('dblclick', () => setParam(id, P[id].def));
+  svg.addEventListener('wheel', e => { e.preventDefault(); setParam(id, fromPos(id, toPos(id, vals[id]) - Math.sign(e.deltaY) * 0.02)); }, { passive: false });
+  return el;
+}
+function makeToggle(el, id) { ui[id] = v => { el.classList.toggle('on', v > 0.5); const card = el.closest('.card[data-power]'); if (card) card.classList.toggle('active', v > 0.5); };
+  el.addEventListener('click', () => setParam(id, vals[id] > 0.5 ? 0 : 1)); }
+
+document.querySelectorAll('.knobs[data-k]').forEach(box => box.dataset.k.split(',').forEach(s => { const [id, nm] = s.split(':');
+  box.appendChild(makeKnob(id, nm, box.classList.contains('big') ? 84 : 58)); }));
+document.querySelectorAll('.card[data-power]').forEach(card => { const t = document.createElement('span'); t.className = 'toggle sw'; t.innerHTML = '<span class="pill"></span>'; card.appendChild(t); makeToggle(t, card.dataset.power); });
+makeToggle($('#bright'), 'bright');
+
+ANJI_AMPS.forEach((a, i) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = a.name; b.onclick = () => setParam('amp', i); $('#models').appendChild(b); });
+ui.amp = v => { [...$('#models').children].forEach((b, i) => b.classList.toggle('dark', i === v)); $('#blurb').textContent = ANJI_AMPS[v].blurb; };
+const fillSelect = (sel, names, id) => { names.forEach((n, i) => sel.add(new Option(n, i))); sel.onchange = () => setParam(id, +sel.value); ui[id] = v => sel.value = v; };
+fillSelect($('#cab'), ANJI_CABS.map(c => c.name), 'cab');
+fillSelect($('#od_mode'), ANJI_DATA.driveModes, 'od_mode');
+
+function setParam(id, v, silent) {
+  if (P[id].type !== 'float') v = Math.round(v);
+  v = Math.min(P[id].max, Math.max(P[id].min, v)); vals[id] = v;
+  if (ui[id]) ui[id](v);
+  if (!silent) send({ type: 'set', id, v });
+}
+function loadPreset(i) {
+  presetIdx = (i + ANJI_DATA.presets.length) % ANJI_DATA.presets.length; const p = ANJI_DATA.presets[presetIdx];
+  ANJI_PARAMS.forEach(q => setParam(q.id, p.values[q.id] ?? q.def, true));
+  send({ type: 'all', values: { ...vals } });
+  $('#preset').value = presetIdx; $('#notes').textContent = p.notes;
+}
+const groups = {}; ANJI_DATA.presets.forEach((p, i) => { if (!groups[p.category]) { groups[p.category] = document.createElement('optgroup'); groups[p.category].label = p.category; $('#preset').appendChild(groups[p.category]); }
+  groups[p.category].appendChild(new Option(p.name, i)); });
+$('#preset').onchange = e => loadPreset(+e.target.value);
+$('#prev').onclick = () => loadPreset(presetIdx - 1);
+$('#next').onclick = () => loadPreset(presetIdx + 1);
+
+RIFFS.forEach((r, i) => { const b = document.createElement('button'); b.className = 'chip' + (i === 0 ? ' on' : ''); b.textContent = r.name; b.style.marginRight = '6px';
+  b.onclick = async () => { curRiff = i; uploaded = null; [...$('#riffs').children].forEach((c, k) => c.classList.toggle('on', k === i));
+    await initAudio(); curBuf = renderRiff(i, ctx.sampleRate); play(); };
+  $('#riffs').appendChild(b); });
+$('#file').onchange = async e => { const f = e.target.files[0]; if (!f) return; await initAudio();
+  try { const ab = await ctx.decodeAudioData(await f.arrayBuffer());
+    const N = ab.length, d = new Float32Array(N); for (let ch = 0; ch < ab.numberOfChannels; ch++) { const c = ab.getChannelData(ch); for (let n = 0; n < N; n++) d[n] += c[n] / ab.numberOfChannels; }
+    let mx = 0; for (let n = 0; n < N; n++) mx = Math.max(mx, Math.abs(d[n])); const b = ctx.createBuffer(1, N, ab.sampleRate); const o = b.getChannelData(0); for (let n = 0; n < N; n++) o[n] = d[n] * 0.5 / (mx || 1);
+    uploaded = curBuf = b; [...$('#riffs').children].forEach(c => c.classList.remove('on')); play();
+  } catch (err) { $('#notes').textContent = "Couldn't read that file. Try a WAV or MP3 of a dry (DI) guitar."; } };
+$('#play').onclick = () => playing ? stop() : play();
+const bp = $('#bypass'); bp.onclick = () => { bypass = !bypass; bp.classList.toggle('on', bypass); if (node) node.port.postMessage({ type: 'bypass', v: bypass }); };
+document.addEventListener('keydown', e => { if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); playing ? stop() : play(); } });
+
+loadPreset(0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anji's Amp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#e6e1d9;--ink:#1f1d1a;--muted:#8a847a;--accent:#e0705a;--track:#ebe6de}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 20px 40px}
+header{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:27px;letter-spacing:-.03em;margin-right:auto}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block}
+.presetbar{display:flex;gap:8px;align-items:center}
+button,select{font:inherit;color:var(--ink)}
+.btn{border:1px solid var(--border);background:var(--card);border-radius:999px;height:38px;padding:0 16px;font-weight:600;font-size:14px;cursor:pointer;transition:background .12s}
+.btn:hover{background:var(--bg)}
+.btn.round{width:38px;padding:0}
+.btn.dark,.btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+select{appearance:none;-webkit-appearance:none;border:1px solid var(--border);background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a847a' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;border-radius:10px;height:38px;padding:0 36px 0 14px;font-size:14px;cursor:pointer}
+#preset{width:300px;text-align:center;text-align-last:center}
+.notes{text-align:center;color:var(--muted);font-size:13.5px;margin:12px 0 16px;min-height:18px}
+.transport{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:14px}
+.transport .lbl{font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--muted);margin:0 6px 0 4px}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:999px;height:32px;padding:0 13px;font-size:13px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.play{width:42px;height:42px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:grid;place-items:center;margin-left:auto}
+.play svg{width:16px;height:16px}
+.meter{width:120px;height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.meter b{display:block;height:100%;width:0;background:var(--accent);transition:width .05s}
+.grid{display:grid;gap:12px}
+.row1{grid-template-columns:140px 210px minmax(0,1fr) 190px}
+.row3{grid-template-columns:250px 140px 180px minmax(0,1fr) 180px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px 10px;box-shadow:0 2px 0 rgba(0,0,0,.03);position:relative}
+.card h3{margin:0 0 6px;font-size:11.5px;letter-spacing:.12em;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:7px}
+.card h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--border)}
+.card.active h3{color:var(--ink)}.card.active h3::before{background:var(--accent)}
+.sw{position:absolute;top:11px;right:12px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--muted);user-select:none}
+.toggle .pill{width:30px;height:16px;border-radius:8px;background:var(--track);position:relative;transition:background .12s}
+.toggle .pill::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .12s}
+.toggle.on{color:var(--ink)}.toggle.on .pill{background:var(--accent)}.toggle.on .pill::after{left:16px}
+.knobs{display:flex;justify-content:space-around;align-items:flex-start;gap:4px}
+.knob{display:flex;flex-direction:column;align-items:center;user-select:none;touch-action:none;min-width:0}
+.knob .nm{font-size:12px;font-weight:700;margin-bottom:2px}
+.knob svg{cursor:ns-resize;display:block}
+.knob .val{font-size:11.5px;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
+.amp{margin:12px 0}
+.models{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin:4px 0 8px}
+.models .btn{height:32px;font-size:13.5px;padding:0 6px}
+.blurb{color:var(--muted);font-size:13.5px;margin:0 4px 6px}
+.ampknobs{display:flex;align-items:center}
+.ampknobs .knobs{flex:1}
+.drivebody{display:flex;align-items:center;gap:10px}.drivebody select{width:130px}
+.drivebody .knobs{flex:1}
+.cabbody{display:flex;gap:8px;align-items:center}
+.cabbody .left{flex:1;display:flex;flex-direction:column;gap:8px}
+.small{font-size:12px;color:var(--muted);line-height:1.4}
+footer{margin-top:18px;color:var(--muted);font-size:12.5px;text-align:center;line-height:1.6}
+@media (max-width:980px){.row1,.row3{grid-template-columns:1fr 1fr}.models{grid-template-columns:repeat(5,1fr)}#preset{width:220px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><i></i>anji's amp</div>
+    <div class="presetbar">
+      <button class="btn round" id="prev" aria-label="Previous preset">&lt;</button>
+      <select id="preset" aria-label="Preset"></select>
+      <button class="btn round" id="next" aria-label="Next preset">&gt;</button>
+    </div>
+  </header>
+  <div class="notes" id="notes"></div>
+
+  <div class="transport">
+    <span class="lbl">INPUT</span>
+    <span id="riffs"></span>
+    <label class="chip" style="display:inline-flex;align-items:center">Upload DI…<input type="file" id="file" accept="audio/*" hidden></label>
+    <span class="toggle" id="bypass"><span>Bypass</span><span class="pill"></span></span>
+    <div class="meter" title="Output level"><b id="meter"></b></div>
+    <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 16 16" id="playicon"><path d="M4 2l10 6-10 6z" fill="#fff"/></svg></button>
+  </div>
+
+  <div class="grid row1">
+    <div class="card" data-power="gate_on"><h3>GATE</h3><div class="knobs" data-k="gate_thresh:Threshold"></div></div>
+    <div class="card" data-power="comp_on"><h3>COMPRESSOR</h3><div class="knobs" data-k="comp_amount:Sustain,comp_level:Level"></div></div>
+    <div class="card" data-power="od_on"><h3>DRIVE</h3>
+      <div class="drivebody"><select id="od_mode" aria-label="Drive type"></select><div class="knobs" data-k="od_drive:Drive,od_tone:Tone,od_level:Level"></div></div></div>
+    <div class="card active"><h3>LEVELS</h3><div class="knobs" data-k="in_gain:Input,out_gain:Output"></div></div>
+  </div>
+
+  <div class="card amp active"><h3>AMP</h3>
+    <div class="models" id="models"></div>
+    <div class="blurb" id="blurb"></div>
+    <div class="ampknobs"><div class="knobs big" data-k="gain:Gain,bass:Bass,mid:Middle,treble:Treble,presence:Presence,resonance:Resonance,master:Master"></div>
+      <span class="toggle" id="bright"><span>Bright</span><span class="pill"></span></span></div>
+  </div>
+
+  <div class="grid row3">
+    <div class="card active"><h3>CABINET</h3>
+      <div class="cabbody"><div class="left"><select id="cab" aria-label="Cabinet"></select>
+        <div class="small">The plugin also loads your own IR files.</div></div>
+        <div class="knobs" data-k="mic:Mic"></div></div></div>
+    <div class="card" data-power="trem_on"><h3>TREMOLO</h3><div class="knobs" data-k="trem_rate:Rate,trem_depth:Depth"></div></div>
+    <div class="card" data-power="chorus_on"><h3>CHORUS</h3><div class="knobs" data-k="chorus_rate:Rate,chorus_depth:Depth,chorus_mix:Mix"></div></div>
+    <div class="card" data-power="delay_on"><h3>DELAY</h3><div class="knobs" data-k="delay_time:Time,delay_fb:Repeat,delay_tone:Tone,delay_mix:Mix"></div></div>
+    <div class="card" data-power="reverb_on"><h3>REVERB</h3><div class="knobs" data-k="reverb_size:Size,reverb_tone:Tone,reverb_mix:Mix"></div></div>
+  </div>
+  <footer>Drag knobs up/down (Shift for fine control); double-click a knob to reset it.<br>
+  This is the same sound engine as the Anji's Amp VST3/AU plugin. Upload a dry DI guitar recording to hear your own playing.</footer>
+</div>
+
+<script id="src-models">/*MODELS*/</script>
+<script id="src-presets">/*PRESETS*/</script>
+<script id="src-engine">/*ENGINE*/</script>
+<script>
+(() => {
+const P = {}; ANJI_PARAMS.forEach(p => P[p.id] = p);
+P.amp.max = ANJI_AMPS.length - 1; P.cab.max = ANJI_CABS.length - 1; P.od_mode.max = ANJI_DATA.driveModes.length - 1;
+const CENTRE = { trem_rate: 4, chorus_rate: 1, delay_time: 350 };
+const vals = {}; let presetIdx = 0;
+const $ = s => document.querySelector(s);
+
+// ---------------- audio
+let ctx = null, node = null, sp = null, src = null, playing = false, bypass = false, engineMain = null, curBuf = null, curRiff = 0, uploaded = null;
+const send = m => { if (node) node.port.postMessage(m); if (engineMain) { if (m.type === 'set') engineMain.set(m.id, m.v); else if (m.type === 'all') engineMain.setAll(m.values); } };
+
+async function initAudio() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  const code = ['src-models', 'src-presets', 'src-engine'].map(id => document.getElementById(id).textContent).join('\n') + `
+  class AnjiProc extends AudioWorkletProcessor {
+    constructor() { super(); this.e = new AnjiEngine(sampleRate); this.byp = false; this.pk = 0; this.cnt = 0;
+      this.port.onmessage = ev => { const d = ev.data; if (d.type === 'set') this.e.set(d.id, d.v); else if (d.type === 'all') this.e.setAll(d.values); else if (d.type === 'bypass') this.byp = d.v; }; }
+    process(inputs, outputs) {
+      const out = outputs[0], L = out[0], R = out[1] || out[0], inp = inputs[0] && inputs[0][0];
+      if (!inp) { L.fill(0); if (R !== L) R.fill(0); return true; }
+      if (this.byp) { L.set(inp); if (R !== L) R.set(inp); } else this.e.process(inp, L, R);
+      for (let i = 0; i < L.length; i++) { const a = Math.abs(L[i]); if (a > this.pk) this.pk = a; }
+      if (++this.cnt >= 12) { this.port.postMessage(this.pk); this.pk = 0; this.cnt = 0; }
+      return true; } }
+  registerProcessor('anji-amp', AnjiProc);`;
+  try {
+    const url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }));
+    await ctx.audioWorklet.addModule(url);
+    node = new AudioWorkletNode(ctx, 'anji-amp', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], channelCount: 1, channelCountMode: 'explicit', channelInterpretation: 'speakers' });
+    node.port.onmessage = ev => showMeter(ev.data);
+  } catch (err) {
+    // Fallback: run the engine on the main thread
+    engineMain = new AnjiEngine(ctx.sampleRate);
+    sp = ctx.createScriptProcessor(1024, 1, 2);
+    sp.onaudioprocess = ev => {
+      const i = ev.inputBuffer.getChannelData(0), L = ev.outputBuffer.getChannelData(0), R = ev.outputBuffer.getChannelData(1);
+      if (bypass) { L.set(i); R.set(i); } else engineMain.process(i, L, R);
+      let pk = 0; for (let k = 0; k < L.length; k++) pk = Math.max(pk, Math.abs(L[k])); showMeter(pk);
+    };
+    node = null;
+  }
+  (node || sp).connect(ctx.destination);
+  send({ type: 'all', values: { ...vals } });
+  send({ type: 'bypass', v: bypass });
+}
+function showMeter(pk) { const db = 20 * Math.log10(pk + 1e-9); $('#meter').style.width = Math.max(0, Math.min(100, (db + 48) / 48 * 100)) + '%'; $('#meter').style.background = db > -1 ? '#d64545' : 'var(--accent)'; }
+
+function startSource() {
+  if (src) { try { src.stop(); } catch (e) {} src.disconnect(); }
+  src = ctx.createBufferSource(); src.buffer = curBuf; src.loop = true;
+  src.connect(node || sp); src.start();
+}
+async function play() {
+  await initAudio(); if (ctx.state === 'suspended') await ctx.resume();
+  if (!curBuf) curBuf = uploaded || renderRiff(curRiff, ctx.sampleRate);
+  startSource(); playing = true; updatePlay();
+}
+function stop() { if (src) { try { src.stop(); } catch (e) {} src = null; } playing = false; updatePlay(); }
+function updatePlay() { $('#playicon').innerHTML = playing ? '<rect x="3" y="2" width="4" height="12" fill="#fff"/><rect x="9" y="2" width="4" height="12" fill="#fff"/>' : '<path d="M4 2l10 6-10 6z" fill="#fff"/>'; }
+
+// ---------------- DI riff synthesis (Karplus-Strong strings)
+const OPEN = [82.407, 110, 146.832, 195.998, 246.942, 329.628];
+const fr = (s, f) => OPEN[s] * Math.pow(2, f / 12);
+function pluck(out, sr, t0, f, amp, t60, opt = {}) {
+  const bright = opt.bright ?? 0.6, mute = !!opt.mute, len = opt.len ?? t60;
+  const D = sr / f - 0.5, size = Math.ceil(D) + 3, buf = new Float32Array(size);
+  let lp = 0; const a = 1 - bright * 0.9, pickOff = Math.max(1, Math.round(size * (opt.pick ?? 0.13)));
+  const ex = new Float32Array(size); for (let i = 0; i < size; i++) { lp = lp * a + (Math.random() * 2 - 1) * (1 - a); ex[i] = lp; }
+  for (let i = 0; i < size; i++) buf[i] = ex[i] - (i >= pickOff ? ex[i - pickOff] : 0);
+  let mx = 0; for (let i = 0; i < size; i++) mx = Math.max(mx, Math.abs(buf[i])); for (let i = 0; i < size; i++) buf[i] /= (mx || 1);
+  const loss = Math.pow(10, -3 / (t60 * f)), w1 = mute ? 0.75 : 0.5;
+  let w = 0, last = 0; const start = Math.floor(t0 * sr), end = Math.min(out.length, start + Math.floor((len + 0.05) * sr)), rel = Math.floor(0.04 * sr);
+  for (let n = start; n < end; n++) {
+    let rp = w - D; while (rp < 0) rp += size; let i0 = rp | 0; if (i0 >= size) i0 -= size; const fr_ = rp - Math.floor(rp);
+    const y = buf[i0] * (1 - fr_) + buf[(i0 + 1) % size] * fr_;
+    const v = loss * (w1 * last + (1 - w1) * y); last = y; buf[w] = v; if (++w >= size) w = 0;
+    const env = n > end - rel ? (end - n) / rel : 1;
+    out[n] += y * amp * env;
+  }
+}
+function strum(out, sr, t, shape, amp, opt = {}) { // shape: frets per string low->high, null = not played
+  const up = opt.up, notes = shape.map((f, s) => f === null ? null : [s, f]).filter(Boolean); if (up) notes.reverse();
+  notes.forEach(([s, f], k) => pluck(out, sr, t + k * (opt.spread ?? 0.009), fr(s, f), amp * (up ? 0.7 : 1) * (0.9 + Math.random() * 0.2), opt.t60 ?? 3, opt));
+}
+const RIFFS = [
+  { name: 'Twinkle arps', bars: 4, bpm: 140, make(out, sr) {
+    const s16 = 60 / this.bpm / 4;
+    const chords = [[[2,3],[3,2],[4,1],[5,0]], [[1,3],[2,2],[3,0],[4,0],[5,0]], [[1,0],[2,2],[3,2],[4,1],[5,0]], [[0,3],[1,2],[3,0],[4,0],[5,3]]];
+    const pat = [0,2,1,3,2,1,3,2, 0,2,1,3,2,4,3,2];
+    chords.forEach((ch, b) => pat.forEach((pi, k) => { const [s, f] = ch[pi % ch.length];
+      pluck(out, sr, (b * 16 + k) * s16, fr(s, f), (k % 4 === 0 ? 1 : 0.75) * (0.9 + Math.random() * 0.2), 3.2, { bright: 0.7, len: 2.5, pick: 0.11 }); }));
+  } },
+  { name: 'Power chords', bars: 4, bpm: 118, make(out, sr) {
+    const e8 = 60 / this.bpm / 2, P5 = (s, f) => s === 0 ? [f, f + 2, f + 2, null, null, null] : [null, f, f + 2, f + 2, null, null];
+    const seq = [ ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(0,3),2],['r',P5(0,5),2],
+                  ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(1,5),2],['r',P5(1,3),2],
+                  ['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['m',P5(0,0)],['r',P5(0,3),2],['r',P5(0,5),2],
+                  ['r',P5(0,7),3],['m',P5(0,5)],['r',P5(0,3),2],['r',P5(0,0),2] ];
+    let t = 0; for (const [k, sh, len = 1] of seq) { const m = k === 'm';
+      strum(out, sr, t, sh, m ? 0.8 : 1, { mute: m, t60: m ? 0.22 : 2.5, len: m ? e8 * 0.9 : e8 * len, bright: m ? 0.35 : 0.65, spread: 0.006 }); t += e8 * len; }
+  } },
+  { name: 'Open strums', bars: 4, bpm: 96, make(out, sr) {
+    const e8 = 60 / this.bpm / 2;
+    const ch = [[3,2,0,0,0,3], [null,3,2,0,1,0], [null,null,0,2,3,2], [0,2,2,0,0,0]];
+    const rhythm = [[0,'d'],[2,'d'],[3,'u'],[5,'u'],[6,'d'],[7,'u']];
+    ch.forEach((c, b) => rhythm.forEach(([pos, dir]) => strum(out, sr, (b * 8 + pos) * e8, c, dir === 'd' ? 0.9 : 0.6, { up: dir === 'u', t60: 2.2, len: 1.6, spread: 0.011, bright: 0.6 })));
+  } },
+  { name: 'Lead lick', bars: 4, bpm: 104, make(out, sr) {
+    const e8 = 60 / this.bpm / 2;
+    const L = [[3,7,1],[4,5,1],[4,8,1],[5,5,1],[5,8,2],[5,5,1],[4,8,1],[4,5,1],[3,7,2],[3,5,1],[2,7,1],[3,5,2],[2,7,4],
+               [4,5,1],[5,5,1],[5,8,1],[5,10,1],[5,8,1],[5,5,1],[4,8,2],[4,5,6]];
+    let t = 0; for (const [s, f, len] of L) { pluck(out, sr, t, fr(s, f), 1, len > 2 ? 3 : 1.6, { len: e8 * len + 0.02, bright: 0.6, pick: 0.2 }); t += e8 * len; }
+  } },
+];
+function renderRiff(i, sr) {
+  const r = RIFFS[i], secs = r.bars * 4 * 60 / r.bpm, N = Math.floor(secs * sr), tail = Math.floor(2.5 * sr);
+  const out = new Float32Array(N + tail); r.make(out, sr);
+  for (let n = 0; n < tail; n++) out[n] += out[N + n];      // wrap ringing tail into the loop start
+  const loop = out.subarray(0, N); let mx = 0; for (let n = 0; n < N; n++) mx = Math.max(mx, Math.abs(loop[n]));
+  const b = ctx.createBuffer(1, N, sr); const d = b.getChannelData(0); for (let n = 0; n < N; n++) d[n] = loop[n] * 0.5 / mx;
+  return b;
+}
+
+// ---------------- UI
+const fmt = (id, v) => { const u = P[id].unit; if (u === 'dB') return (v > 0 ? '+' : '') + v.toFixed(1) + ' dB'; if (u === 'ms') return Math.round(v) + ' ms'; if (u === 'Hz') return v.toFixed(2) + ' Hz'; return v.toFixed(1); };
+const skew = id => CENTRE[id] ? Math.log(0.5) / Math.log((CENTRE[id] - P[id].min) / (P[id].max - P[id].min)) : 1;
+const toPos = (id, v) => Math.pow((v - P[id].min) / (P[id].max - P[id].min), skew(id));
+const fromPos = (id, p) => P[id].min + (P[id].max - P[id].min) * Math.pow(Math.min(1, Math.max(0, p)), 1 / skew(id));
+const A0 = -135, A1 = 135;
+const pt = (cx, cy, r, deg) => { const a = (deg - 90) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+const arc = (cx, cy, r, d0, d1) => { if (d1 - d0 < 0.5) return ''; const [x0, y0] = pt(cx, cy, r, d0), [x1, y1] = pt(cx, cy, r, d1); return `M${x0} ${y0} A${r} ${r} 0 ${d1 - d0 > 180 ? 1 : 0} 1 ${x1} ${y1}`; };
+const ui = {};
+
+function makeKnob(id, name, size) {
+  const el = document.createElement('div'); el.className = 'knob';
+  const c = size / 2, lw = Math.max(2.5, size * 0.045), ar = c - lw / 2 - 2, br = c - lw * 2.4 - 2;
+  el.innerHTML = `<div class="nm">${name}</div><svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <path d="${arc(c, c, ar, A0, A1)}" stroke="var(--track)" stroke-width="${lw}" fill="none" stroke-linecap="round"/>
+    <path class="va" stroke="var(--accent)" stroke-width="${lw}" fill="none" stroke-linecap="round"/>
+    <circle cx="${c}" cy="${c + 2}" r="${br}" fill="rgba(0,0,0,.06)"/><circle cx="${c}" cy="${c}" r="${br}" fill="#fff" stroke="var(--border)"/>
+    <line class="ptr" stroke="var(--ink)" stroke-width="${Math.max(1.8, br * 0.09)}" stroke-linecap="round"/></svg><div class="val"></div>`;
+  const va = el.querySelector('.va'), ptr = el.querySelector('.ptr'), valEl = el.querySelector('.val'), svg = el.querySelector('svg');
+  ui[id] = v => { const d = A0 + toPos(id, v) * (A1 - A0); va.setAttribute('d', arc(c, c, ar, A0, d));
+    const [x0, y0] = pt(c, c, br * 0.3, d), [x1, y1] = pt(c, c, br * 0.78, d); ptr.setAttribute('x1', x0); ptr.setAttribute('y1', y0); ptr.setAttribute('x2', x1); ptr.setAttribute('y2', y1);
+    valEl.textContent = fmt(id, v); };
+  let startY = 0, startPos = 0;
+  svg.addEventListener('pointerdown', e => { svg.setPointerCapture(e.pointerId); startY = e.clientY; startPos = toPos(id, vals[id]); });
+  svg.addEventListener('pointermove', e => { if (!svg.hasPointerCapture(e.pointerId)) return; const sens = e.shiftKey ? 900 : 220;
+    setParam(id, fromPos(id, startPos + (startY - e.clientY) / sens)); });
+  svg.addEventListener('dblclick', () => setParam(id, P[id].def));
+  svg.addEventListener('wheel', e => { e.preventDefault(); setParam(id, fromPos(id, toPos(id, vals[id]) - Math.sign(e.deltaY) * 0.02)); }, { passive: false });
+  return el;
+}
+function makeToggle(el, id) { ui[id] = v => { el.classList.toggle('on', v > 0.5); const card = el.closest('.card[data-power]'); if (card) card.classList.toggle('active', v > 0.5); };
+  el.addEventListener('click', () => setParam(id, vals[id] > 0.5 ? 0 : 1)); }
+
+document.querySelectorAll('.knobs[data-k]').forEach(box => box.dataset.k.split(',').forEach(s => { const [id, nm] = s.split(':');
+  box.appendChild(makeKnob(id, nm, box.classList.contains('big') ? 84 : 58)); }));
+document.querySelectorAll('.card[data-power]').forEach(card => { const t = document.createElement('span'); t.className = 'toggle sw'; t.innerHTML = '<span class="pill"></span>'; card.appendChild(t); makeToggle(t, card.dataset.power); });
+makeToggle($('#bright'), 'bright');
+
+ANJI_AMPS.forEach((a, i) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = a.name; b.onclick = () => setParam('amp', i); $('#models').appendChild(b); });
+ui.amp = v => { [...$('#models').children].forEach((b, i) => b.classList.toggle('dark', i === v)); $('#blurb').textContent = ANJI_AMPS[v].blurb; };
+const fillSelect = (sel, names, id) => { names.forEach((n, i) => sel.add(new Option(n, i))); sel.onchange = () => setParam(id, +sel.value); ui[id] = v => sel.value = v; };
+fillSelect($('#cab'), ANJI_CABS.map(c => c.name), 'cab');
+fillSelect($('#od_mode'), ANJI_DATA.driveModes, 'od_mode');
+
+function setParam(id, v, silent) {
+  if (P[id].type !== 'float') v = Math.round(v);
+  v = Math.min(P[id].max, Math.max(P[id].min, v)); vals[id] = v;
+  if (ui[id]) ui[id](v);
+  if (!silent) send({ type: 'set', id, v });
+}
+function loadPreset(i) {
+  presetIdx = (i + ANJI_DATA.presets.length) % ANJI_DATA.presets.length; const p = ANJI_DATA.presets[presetIdx];
+  ANJI_PARAMS.forEach(q => setParam(q.id, p.values[q.id] ?? q.def, true));
+  send({ type: 'all', values: { ...vals } });
+  $('#preset').value = presetIdx; $('#notes').textContent = p.notes;
+}
+const groups = {}; ANJI_DATA.presets.forEach((p, i) => { if (!groups[p.category]) { groups[p.category] = document.createElement('optgroup'); groups[p.category].label = p.category; $('#preset').appendChild(groups[p.category]); }
+  groups[p.category].appendChild(new Option(p.name, i)); });
+$('#preset').onchange = e => loadPreset(+e.target.value);
+$('#prev').onclick = () => loadPreset(presetIdx - 1);
+$('#next').onclick = () => loadPreset(presetIdx + 1);
+
+RIFFS.forEach((r, i) => { const b = document.createElement('button'); b.className = 'chip' + (i === 0 ? ' on' : ''); b.textContent = r.name; b.style.marginRight = '6px';
+  b.onclick = async () => { curRiff = i; uploaded = null; [...$('#riffs').children].forEach((c, k) => c.classList.toggle('on', k === i));
+    await initAudio(); curBuf = renderRiff(i, ctx.sampleRate); play(); };
+  $('#riffs').appendChild(b); });
+$('#file').onchange = async e => { const f = e.target.files[0]; if (!f) return; await initAudio();
+  try { const ab = await ctx.decodeAudioData(await f.arrayBuffer());
+    const N = ab.length, d = new Float32Array(N); for (let ch = 0; ch < ab.numberOfChannels; ch++) { const c = ab.getChannelData(ch); for (let n = 0; n < N; n++) d[n] += c[n] / ab.numberOfChannels; }
+    let mx = 0; for (let n = 0; n < N; n++) mx = Math.max(mx, Math.abs(d[n])); const b = ctx.createBuffer(1, N, ab.sampleRate); const o = b.getChannelData(0); for (let n = 0; n < N; n++) o[n] = d[n] * 0.5 / (mx || 1);
+    uploaded = curBuf = b; [...$('#riffs').children].forEach(c => c.classList.remove('on')); play();
+  } catch (err) { $('#notes').textContent = "Couldn't read that file. Try a WAV or MP3 of a dry (DI) guitar."; } };
+$('#play').onclick = () => playing ? stop() : play();
+const bp = $('#bypass'); bp.onclick = () => { bypass = !bypass; bp.classList.toggle('on', bypass); if (node) node.port.postMessage({ type: 'bypass', v: bypass }); };
+document.addEventListener('keydown', e => { if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); playing ? stop() : play(); } });
+
+loadPreset(0);
+})();
+</script>
+</body>
+</html>
